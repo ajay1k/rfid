@@ -3,162 +3,20 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Doordarshan</title>
-    <style>
-        /* General reset */
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: 'Arial', sans-serif;
-            background-image: url('https://img.freepik.com/free-vector/circles-background-dark-tones_60389-166.jpg?semt=ais_hybrid');
-            background-size: cover;
-            background-position: center;
-            background-attachment: fixed;
-            color: #000000;
-        }
-
-        /* Main container */
-        .container {
-            max-width: 1200px;
-            margin: 50px auto;
-            background: rgba(0, 0, 0, 0.8);
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
-        }
-
-        h1 {
-            text-align: center;
-            margin-bottom: 20px;
-            color: #4CAF50;
-            font-size: 2.5em;
-        }
-
-        nav {
-            text-align: center;
-            margin-bottom: 30px;
-        }
-
-        nav a {
-            margin: 0 10px;
-            text-decoration: none;
-            color: #4CAF50;
-            font-weight: bold;
-            font-size: 1.2em;
-        }
-
-        nav a:hover {
-            text-decoration: underline;
-            color: #fff;
-        }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            overflow: hidden;
-            background: #f9f9f9;
-            border-radius: 8px;
-        }
-
-        table, th, td {
-            border: 1px solid #ddd;
-        }
-
-        th, td {
-            padding: 15px;
-            text-align: left;
-        }
-
-        th {
-            background-color: #4CAF50;
-            color: white;
-        }
-
-        tbody tr:nth-child(odd) {
-            background: #f2f2f2;
-        }
-
-        tbody tr:nth-child(even) {
-            background: #ffffff;
-        }
-
-        footer {
-            margin-top: 20px;
-            text-align: center;
-            color: #aaa;
-        }
-    </style>
+    <title>Login - Google Sheets Name Editor</title>
+    <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <div class="container">
-        <h1>Doordarshan</h1>
-        <nav>
-            <a href="user.html">USER DATA</a>
-        </nav>
-        <table>
-            <thead>
-                <tr>
-                    <th>Name</th>
-                    <th>UID</th>
-                    <th>Date</th>
-                    <th>Time In</th>
-                    <th>Time Out</th>
-                </tr>
-            </thead>
-            <tbody id="Attendance">
-                <!-- Data will be dynamically inserted here -->
-            </tbody>
-        </table>
-        <footer>
-            &copy; 2025 Attendance Tracker | All Rights Reserved
-        </footer>
+    <div class="login-container">
+        <h2>Login</h2>
+        <form id="loginForm">
+            <input type="text" id="username" placeholder="Username" required>
+            <input type="password" id="password" placeholder="Password" required>
+            <button type="submit">Login</button>
+        </form>
+        <p id="errorMessage" class="error-message"></p>
     </div>
 
-    <script>
-        const sheetCSVURL = "https://docs.google.com/spreadsheets/d/1Q2TcXVtNQZstuW9c-i9RqXswKe35uSFQRrfkLn4B4iQ/export?format=csv&gid=1932121512";
-
-        async function fetchData(sheetURL, tableId) {
-            try {
-                // Fetch the data from the CSV export URL
-                const response = await fetch(sheetURL);
-                const data = await response.text();
-
-                // Split the data into rows and process it
-                const rows = data.split('\n');
-                const tableBody = document.getElementById(tableId);
-
-                // Clear the existing table data
-                tableBody.innerHTML = '';
-
-                // Skip the header row and populate the table
-                rows.slice(1).forEach(row => {
-                    const cols = row.split(',');
-                    if (cols.length > 1) {
-                        const tr = document.createElement('tr');
-                        cols.forEach(col => {
-                            const td = document.createElement('td');
-                            td.textContent = col.trim(); // Remove extra spaces
-                            tr.appendChild(td);
-                        });
-                        tableBody.appendChild(tr);
-                    }
-                });
-            } catch (error) {
-                console.error('Error fetching data:', error);
-            }
-        }
-
-        // Initial data fetch
-        fetchData(sheetCSVURL, 'Attendance');
-
-        // Auto-refresh data every 1 second
-        setInterval(() => {
-            fetchData(sheetCSVURL, 'Attendance');
-        }, 1000); // 1 second
-    </script>
+    <script src="auth.js"></script>
 </body>
 </html>
