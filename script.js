@@ -47,8 +47,8 @@ function attendance() {
     window.location.href = "index.html";
 }
 
-// Auto-refresh every 10 seconds
-setInterval(fetchEntries, 10000);
+// Auto-refresh every 3 miniute
+setInterval(fetchEntries, 180000);
 
 // Load data on page load
 fetchEntries();
