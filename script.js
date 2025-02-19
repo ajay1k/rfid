@@ -39,6 +39,13 @@ async function updateName(uid) {
     alert(result);
     fetchEntries();  // Refresh data
 }
+function logout() {
+    localStorage.removeItem("isAuthenticated");
+    window.location.href = "login.html";
+}
+function attendance() {
+    window.location.href = "index.html";
+}
 
 // Auto-refresh every 10 seconds
 setInterval(fetchEntries, 10000);
