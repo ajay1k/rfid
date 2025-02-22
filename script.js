@@ -48,7 +48,7 @@ function attendance() {
 }
 
 // Auto-refresh every 3 miniute
-setInterval(fetchEntries, 180000);
+setInterval(fetchEntries, 60000);
 
 // Load data on page load
 fetchEntries();
