@@ -7,7 +7,7 @@
     <style>
         /* Global Styles */
         body {
-            font-family: 'Poppins', sans-serif;
+            font-family: Arial, sans-serif;
             text-align: center;
             background: url('bg.avif') no-repeat center center fixed;
             background-size: cover;
@@ -18,20 +18,18 @@
 
         /* Page Container */
         .container {
-            background: rgba(0, 0, 0, 0.8); /* Dark overlay */
+            background: rgba(0, 0, 0, 0.7);
             padding: 30px;
             border-radius: 10px;
-            width: 90%;
-            max-width: 800px;
-            margin: 50px auto;
-            box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.4);
+            width: 80%;
+            margin: 40px auto;
+            box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.3);
         }
 
         h1 {
-            font-size: 32px;
-            text-transform: uppercase;
+            font-size: 28px;
             letter-spacing: 1px;
-            margin-bottom: 20px;
+            text-transform: uppercase;
         }
 
         /* Table Styling */
@@ -39,14 +37,13 @@
             width: 100%;
             border-collapse: collapse;
             background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(10px);
+            backdrop-filter: blur(5px);
             border-radius: 10px;
             overflow: hidden;
-            margin-top: 20px;
         }
 
         th, td {
-            padding: 14px;
+            padding: 12px;
             border-bottom: 1px solid rgba(255, 255, 255, 0.2);
             text-align: center;
         }
@@ -58,13 +55,13 @@
         }
 
         tbody tr:hover {
-            background: rgba(255, 255, 255, 0.2);
+            background: rgba(255, 255, 255, 0.15);
             transition: 0.3s;
         }
 
         /* Input & Button Styles */
         input {
-            padding: 10px;
+            padding: 8px;
             width: 80%;
             border: none;
             border-radius: 5px;
@@ -72,19 +69,14 @@
             outline: none;
             background: rgba(255, 255, 255, 0.2);
             color: white;
-            transition: 0.3s;
-        }
-
-        input:focus {
-            background: rgba(255, 255, 255, 0.3);
         }
 
         input::placeholder {
             color: rgba(255, 255, 255, 0.7);
         }
 
-        .btn {
-            padding: 12px 18px;
+        button {
+            padding: 10px 15px;
             background-color: #ff4747;
             color: white;
             border: none;
@@ -92,43 +84,19 @@
             border-radius: 5px;
             font-weight: bold;
             transition: 0.3s;
-            margin: 10px;
         }
 
-        .btn:hover {
+        button:hover {
             background-color: #ff1a1a;
             transform: scale(1.05);
-        }
-
-        .update-btn {
-            background-color: #28a745;
-        }
-
-        .update-btn:hover {
-            background-color: #218838;
-        }
-
-        .delete-btn {
-            background-color: #dc3545;
-        }
-
-        .delete-btn:hover {
-            background-color: #c82333;
-        }
-
-        .button-container {
-            margin-bottom: 20px;
         }
     </style>
 </head>
 <body>
     <div class="container">
         <h1>Registration Panel</h1>
-
-        <div class="button-container">
-            <button class="btn" onclick="logout()">Logout</button>
-            <button class="btn" onclick="attendance()">Attendance</button>
-        </div>
+        <button onclick="logout()">Logout</button>
+        <button onclick="attendance()">Attendance</button>
 
         <table id="dataTable">
             <thead>
