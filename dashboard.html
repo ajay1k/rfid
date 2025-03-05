@@ -3,25 +3,34 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Registration Panel</title>
+    <title>RFID Registration Panel</title>
     <style>
         body {
             font-family: Arial, sans-serif;
-            background: linear-gradient(to right, #141e30, #243b55);
+            background-color: #16222A;
             color: white;
             text-align: center;
-            padding: 20px;
         }
         .container {
-            width: 80%;
-            margin: auto;
-            background: rgba(0, 0, 0, 0.8);
+            margin: 50px auto;
+            width: 50%;
+            background: #1E2A38;
             padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0px 0px 10px rgba(255, 255, 255, 0.2);
+            border-radius: 8px;
         }
-        h2 {
-            margin-bottom: 10px;
+        input, button {
+            padding: 10px;
+            margin: 5px;
+            border-radius: 5px;
+        }
+        button {
+            cursor: pointer;
+            background: #28A745;
+            color: white;
+            border: none;
+        }
+        .delete-btn {
+            background: #DC3545;
         }
         table {
             width: 100%;
@@ -31,144 +40,95 @@
         th, td {
             padding: 10px;
             border: 1px solid white;
-            text-align: center;
-        }
-        th {
-            background: #ff5733;
-        }
-        button {
-            padding: 8px 12px;
-            margin: 5px;
-            border: none;
-            cursor: pointer;
-            font-weight: bold;
-            border-radius: 5px;
-        }
-        .btn-add { background: #28a745; color: white; }
-        .btn-update { background: #ffc107; }
-        .btn-delete { background: #dc3545; color: white; }
-        .btn-attendance { background: #17a2b8; color: white; }
-        input {
-            padding: 8px;
-            margin: 10px;
-            border-radius: 5px;
-            border: 1px solid gray;
         }
     </style>
 </head>
 <body>
 
+    <h1>RFID Registration Panel</h1>
     <div class="container">
-        <h2>Registration Panel</h2>
-        <button class="btn-attendance" onclick="markAttendance()">Mark Attendance</button>
+        <input type="text" id="name" placeholder="Enter Name">
+        <input type="text" id="uid" placeholder="Enter UID">
+        <button onclick="addUser()">Add User</button>
+        
         <table>
             <thead>
                 <tr>
                     <th>Name</th>
                     <th>UID</th>
-                    <th>Update</th>
-                    <th>Delete</th>
+                    <th>Action</th>
                 </tr>
             </thead>
-            <tbody id="userTableBody"></tbody>
+            <tbody id="userTable"></tbody>
         </table>
-
-        <h3>Add New User</h3>
-        <input type="text" id="newName" placeholder="Enter Name">
-        <input type="text" id="newUID" placeholder="Enter UID">
-        <button class="btn-add" onclick="addUser()">Add User</button>
     </div>
 
     <script>
-        const API_URL = "YOUR_GOOGLE_APPS_SCRIPT_URL"; // Replace with your Web App URL
+        const API_URL = "Yhttps://script.google.com/macros/s/AKfycbzGZc5mG2xlgf-X6vBELzoBk7EBdb2Ad4ge5ArMwWs9q5cjrL-ShCJgPbj0JLe_gPJ31g/exec"; // Replace this with your Web App URL
 
-        // Function to Fetch & Display Data
-        async function fetchUserData() {
-            try {
-                let response = await fetch(API_URL);
-                let data = await response.json();
+        function addUser() {
+            const name = document.getElementById("name").value;
+            const uid = document.getElementById("uid").value;
 
-                let tableBody = document.getElementById("userTableBody");
-                tableBody.innerHTML = ""; // Clear old data
-
-                data.forEach((user) => {
-                    let row = `<tr>
-                        <td>${user.name}</td>
-                        <td>${user.uid}</td>
-                        <td><button class="btn-update" onclick="updateUser('${user.uid}', '${user.name}')">Update</button></td>
-                        <td><button class="btn-delete" onclick="deleteUser('${user.uid}')">Delete</button></td>
-                    </tr>`;
-                    tableBody.innerHTML += row;
-                });
-            } catch (error) {
-                console.error("Error fetching data:", error);
-            }
-        }
-
-        // Function to Add New User
-        async function addUser() {
-            let name = document.getElementById("newName").value;
-            let uid = document.getElementById("newUID").value;
             if (!name || !uid) {
-                alert("Please enter both Name and UID!");
+                alert("Please fill all fields!");
                 return;
             }
 
-            let response = await fetch(API_URL, {
+            fetch(API_URL, {
                 method: "POST",
-                body: JSON.stringify({ action: "addUser", name: name, uid: uid }),
-            });
-
-            let result = await response.text();
-            alert(result);
-            fetchUserData();
+                body: JSON.stringify({ action: "addUser", name, uid }),
+                headers: { "Content-Type": "application/json" }
+            })
+            .then(response => response.json())
+            .then(data => {
+                alert(data.message);
+                loadUsers();
+            })
+            .catch(error => console.error("Error:", error));
         }
 
-        // Function to Update User
-        async function updateUser(uid, oldName) {
-            let newName = prompt("Enter new name for UID " + uid, oldName);
-            if (!newName) return;
-
-            let response = await fetch(API_URL, {
+        function deleteUser(uid) {
+            fetch(API_URL, {
                 method: "POST",
-                body: JSON.stringify({ action: "updateUser", uid: uid, name: newName }),
-            });
-
-            let result = await response.text();
-            alert(result);
-            fetchUserData();
+                body: JSON.stringify({ action: "deleteUser", uid }),
+                headers: { "Content-Type": "application/json" }
+            })
+            .then(response => response.json())
+            .then(data => {
+                alert(data.message);
+                loadUsers();
+            })
+            .catch(error => console.error("Error:", error));
         }
 
-        // Function to Delete User
-        async function deleteUser(uid) {
-            if (!confirm("Are you sure you want to delete UID " + uid + "?")) return;
+        function loadUsers() {
+            fetch("https://docs.google.com/spreadsheets/d/YOUR_SPREADSHEET_ID/gviz/tq?tqx=out:json")
+            .then(res => res.text())
+            .then(text => {
+                const json = JSON.parse(text.substring(47, text.length - 2));
+                const rows = json.table.rows;
+                const tableBody = document.getElementById("userTable");
+                tableBody.innerHTML = "";
 
-            let response = await fetch(API_URL, {
-                method: "POST",
-                body: JSON.stringify({ action: "deleteUser", uid: uid }),
-            });
+                rows.forEach((row, index) => {
+                    if (index === 0) return; // Skip headers
 
-            let result = await response.text();
-            alert(result);
-            fetchUserData();
+                    let name = row.c[0]?.v || "";
+                    let uid = row.c[1]?.v || "";
+
+                    let tr = `<tr>
+                        <td>${name}</td>
+                        <td>${uid}</td>
+                        <td><button class="delete-btn" onclick="deleteUser('${uid}')">Delete</button></td>
+                    </tr>`;
+                    tableBody.innerHTML += tr;
+                });
+            })
+            .catch(error => console.error("Error:", error));
         }
 
-        // Function to Mark Attendance
-        async function markAttendance() {
-            let uid = prompt("Enter UID for attendance:");
-            if (!uid) return;
-
-            let response = await fetch(API_URL, {
-                method: "POST",
-                body: JSON.stringify({ action: "addAttendance", uid: uid }),
-            });
-
-            let result = await response.text();
-            alert(result);
-        }
-
-        // Load Data When Page Opens
-        document.addEventListener("DOMContentLoaded", fetchUserData);
+        loadUsers();
     </script>
 
 </body>
