@@ -1,4 +1,4 @@
-const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbwq89Jz8x3JNSeM_zIlSI0Tm34yItgwp58G4svTWQ55z56ppS4P3wCoL8XV0G0aXlFm6w/exec"; // Replace with your Web App URL
+const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbxXrXRuJuAjj6lf7LQqSkkg5MGOZV7nWFiQNcjnPNymESUdWaya6t8JLlYOLMfQ9YTIuA/exec"; // Replace with your Web App URL
 
 async function fetchEntries() {
     try {
