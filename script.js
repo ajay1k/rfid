@@ -1,71 +1,62 @@
-const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbxIV22jRtFbux6EbAPtvOGPtNhNbHCNMNr4OYNGafRHCN3JzlwwpQYeadj9Mt2LYSU0Lg/exec"; // Replace with your actual Web App URL
+const WEB_APP_URL = "https://script.google.com/macros/s/AKfycby_AO78WXfa2CPmTheknQFdnkeJ-IanWN-sPLwc2Mm5Cy-tWiX_7ZOAHmv9KlnZ6Aa72A/exec"; // Replace with actual Web App URL
 
-// Function to fetch and display data
 async function fetchEntries() {
-    let response = await fetch(WEB_APP_URL, {
-        method: "POST",
-        body: JSON.stringify({ action: "get" })
-    });
+    try {
+        let response = await fetch(WEB_APP_URL, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ action: "get" })
+        });
 
-    let data = await response.json();
-    const tableBody = document.querySelector("#dataTable tbody");
-    tableBody.innerHTML = "";  // Clear existing rows
+        let result = await response.json();
+        console.log("Fetched Data:", result);
 
-    data.forEach((row, index) => {
-        if (index > 0) { // Skip headers
-            let tr = document.createElement("tr");
-            tr.innerHTML = `
-                <td>${row[0]}</td>
-                <td>${row[1]}</td>
-                <td><input type="text" id="newName-${row[1]}" placeholder="Enter new name"></td>
-                <td><button onclick="updateName('${row[1]}')">Update</button></td>
-                <td><button onclick="deleteEntry('${row[1]}')">Delete</button></td>
-            `;
-            tableBody.appendChild(tr);
+        const tableBody = document.querySelector("#dataTable tbody");
+        tableBody.innerHTML = "";
+
+        if (result.status === "success" && result.data.length > 0) {
+            result.data.forEach(row => {
+                let tr = document.createElement("tr");
+                tr.innerHTML = `
+                    <td>${row.name}</td>
+                    <td>${row.uid}</td>
+                    <td><input type="text" id="newName-${row.uid}" placeholder="Enter new name"></td>
+                    <td><button onclick="updateName('${row.uid}')">Update</button></td>
+                    <td><button onclick="deleteEntry('${row.uid}')">Delete</button></td>
+                `;
+                tableBody.appendChild(tr);
+            });
+        } else {
+            tableBody.innerHTML = `<tr><td colspan="5">No data found</td></tr>`;
         }
-    });
+    } catch (error) {
+        console.error("Error fetching data:", error);
+    }
 }
 
-// Function to update a name
 async function updateName(uid) {
     let newName = document.getElementById(`newName-${uid}`).value;
     if (!newName) return alert("Please enter a new name!");
 
-    let response = await fetch(WEB_APP_URL, {
+    await fetch(WEB_APP_URL, {
         method: "POST",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ action: "update", uid: uid, newName: newName })
     });
 
-    let result = await response.text();
-    alert(result);
-    fetchEntries();  // Refresh data
+    fetchEntries();
 }
 
-// Function to delete an entry
 async function deleteEntry(uid) {
-    if (!confirm("Are you sure you want to delete this entry?")) return;
+    if (!confirm("Are you sure?")) return;
 
-    let response = await fetch(WEB_APP_URL, {
+    await fetch(WEB_APP_URL, {
         method: "POST",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ action: "delete", uid: uid })
     });
 
-    let result = await response.text();
-    alert(result);
-    fetchEntries();  // Refresh data
+    fetchEntries();
 }
 
-function logout() {
-    localStorage.removeItem("isAuthenticated");
-    window.location.href = "login.html";
-}
-
-function attendance() {
-    window.location.href = "index.html";
-}
-
-// Auto-refresh every 0.5 minute
-setInterval(fetchEntries, 30000);
-
-// Load data on page load
-fetchEntries();
+document.addEventListener("DOMContentLoaded", fetchEntries);
