@@ -4,15 +4,12 @@ async function fetchEntries() {
     try {
         let response = await fetch(WEB_APP_URL, {
             method: "POST",
-            headers: { "Content-Type": "application/json" }, // Add headers
+            headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ action: "get" })
         });
 
-        if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
-
         let result = await response.json();
-        console.log("Data received:", result); // Debugging
-
+        console.log("Data received:", result);
         if (result.status === "success") {
             updateTable(result.data);
         } else {
@@ -20,7 +17,7 @@ async function fetchEntries() {
         }
     } catch (error) {
         console.error("Fetch error:", error);
-        alert("Error fetching data. Check console for details.");
+        alert("Error fetching data. Make sure your Web App is deployed correctly.");
     }
 }
 
