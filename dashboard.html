@@ -158,7 +158,7 @@
         });
 
         function fetchUserData() {
-            fetch("https://script.google.com/macros/s/YOUR_SCRIPT_ID/exec?action=getUsers")
+            fetch("hhttps://script.google.com/macros/s/AKfycbytYKi7Whng8E3QdCfcs4n6rmFIs0z4z90tPBNeIgO25UxBcXJGsLxg0t-nA2CSouqHFg/exec?action=getUsers")
                 .then(response => response.json())
                 .then(data => {
                     const tableBody = document.getElementById("userTable");
@@ -185,7 +185,7 @@
                 return;
             }
 
-            fetch("https://script.google.com/macros/s/AKfycbwgpEy1oEt9pqZWN86oBIVkTS8v2TJe8yrgqPWS06VY4PJfLRaX75KmHWDrj-OrTXhn_g/exec", {
+            fetch("https://script.google.com/macros/s/AKfycbytYKi7Whng8E3QdCfcs4n6rmFIs0z4z90tPBNeIgO25UxBcXJGsLxg0t-nA2CSouqHFg/exec", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ action: "update", uid: uid, newName: newName })
@@ -201,7 +201,7 @@
         function deleteUser(uid) {
             if (!confirm("Are you sure you want to delete this user?")) return;
 
-            fetch("https://script.google.com/macros/s/YOUR_SCRIPT_ID/exec", {
+            fetch("https://script.google.com/macros/s/AKfycbytYKi7Whng8E3QdCfcs4n6rmFIs0z4z90tPBNeIgO25UxBcXJGsLxg0t-nA2CSouqHFg/exec", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ action: "delete", uid: uid })
