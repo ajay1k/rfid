@@ -7,128 +7,96 @@
     <style>
         body {
             font-family: Arial, sans-serif;
-            background-color: #16222A;
+            background: linear-gradient(to right, #0f2027, #203a43, #2c5364);
+            color: white;
+            text-align: center;
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            width: 80%;
+            margin: 50px auto;
+            background: rgba(0, 0, 0, 0.7);
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.5);
+        }
+
+        h1 {
+            margin-bottom: 20px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        th, td {
+            padding: 12px;
+            text-align: center;
+        }
+
+        th {
+            background: rgba(255, 255, 255, 0.2);
+            font-weight: bold;
+        }
+
+        td {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        input {
+            padding: 8px;
+            width: 80%;
+            border: none;
+            border-radius: 5px;
+            background: rgba(255, 255, 255, 0.2);
             color: white;
             text-align: center;
         }
-        .container {
-            margin: 50px auto;
-            width: 50%;
-            background: #1E2A38;
-            padding: 20px;
-            border-radius: 8px;
+
+        input::placeholder {
+            color: #ddd;
         }
-        input, button {
-            padding: 10px;
-            margin: 5px;
-            border-radius: 5px;
-        }
+
         button {
-            cursor: pointer;
-            background: #28A745;
+            background: red;
             color: white;
+            padding: 8px 15px;
             border: none;
+            cursor: pointer;
+            border-radius: 5px;
+            font-weight: bold;
         }
-        .delete-btn {
-            background: #DC3545;
-        }
-        table {
-            width: 100%;
-            margin-top: 20px;
-            border-collapse: collapse;
-        }
-        th, td {
-            padding: 10px;
-            border: 1px solid white;
+
+        button:hover {
+            background: darkred;
         }
     </style>
 </head>
 <body>
 
-    <h1>RFID Registration Panel</h1>
     <div class="container">
-        <input type="text" id="name" placeholder="Enter Name">
-        <input type="text" id="uid" placeholder="Enter UID">
-        <button onclick="addUser()">Add User</button>
-        
+        <h1>Registration Panel</h1>
         <table>
             <thead>
                 <tr>
-                    <th>Name</th>
+                    <th>NAME</th>
                     <th>UID</th>
-                    <th>Action</th>
+                    <th>NEW NAME</th>
+                    <th>UPDATE</th>
                 </tr>
             </thead>
-            <tbody id="userTable"></tbody>
+            <tbody id="userTable">
+                <!-- Data will be loaded here from JavaScript -->
+            </tbody>
         </table>
     </div>
 
     <script>
-        const API_URL = "https://script.google.com/macros/s/AKfycbwgpEy1oEt9pqZWN86oBIVkTS8v2TJe8yrgqPWS06VY4PJfLRaX75KmHWDrj-OrTXhn_g/exec"; // Replace this with your Web App URL
-
-        function addUser() {
-            const name = document.getElementById("name").value;
-            const uid = document.getElementById("uid").value;
-
-            if (!name || !uid) {
-                alert("Please fill all fields!");
-                return;
-            }
-
-            fetch(API_URL, {
-                method: "POST",
-                body: JSON.stringify({ action: "addUser", name, uid }),
-                headers: { "Content-Type": "application/json" }
-            })
-            .then(response => response.json())
-            .then(data => {
-                alert(data.message);
-                loadUsers();
-            })
-            .catch(error => console.error("Error:", error));
-        }
-
-        function deleteUser(uid) {
-            fetch(API_URL, {
-                method: "POST",
-                body: JSON.stringify({ action: "deleteUser", uid }),
-                headers: { "Content-Type": "application/json" }
-            })
-            .then(response => response.json())
-            .then(data => {
-                alert(data.message);
-                loadUsers();
-            })
-            .catch(error => console.error("Error:", error));
-        }
-
-        function loadUsers() {
-            fetch("https://docs.google.com/spreadsheets/d/YOUR_SPREADSHEET_ID/gviz/tq?tqx=out:json")
-            .then(res => res.text())
-            .then(text => {
-                const json = JSON.parse(text.substring(47, text.length - 2));
-                const rows = json.table.rows;
-                const tableBody = document.getElementById("userTable");
-                tableBody.innerHTML = "";
-
-                rows.forEach((row, index) => {
-                    if (index === 0) return; // Skip headers
-
-                    let name = row.c[0]?.v || "";
-                    let uid = row.c[1]?.v || "";
-
-                    let tr = `<tr>
-                        <td>${name}</td>
-                        <td>${uid}</td>
-                        <td><button class="delete-btn" onclick="deleteUser('${uid}')">Delete</button></td>
-                    </tr>`;
-                    tableBody.innerHTML += tr;
-                });
-            })
-            .catch(error => console.error("Error:", error));
-        }
-
-        loadUsers();
+       script.js
     </script>
 
 </body>
