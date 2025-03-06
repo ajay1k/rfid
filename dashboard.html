@@ -1,110 +1,65 @@
 <!DOCTYPE html>
 <html lang="en">
-    <style>
-    body {
-    font-family: Arial, sans-serif;
-    background: #222;
-    color: #fff;
-    text-align: center;
-}
-
-.container {
-    width: 80%;
-    margin: 20px auto;
-    background: #333;
-    padding: 20px;
-    border-radius: 10px;
-}
-
-table {
-    width: 100%;
-    border-collapse: collapse;
-    margin-top: 20px;
-}
-
-th, td {
-    border: 1px solid #444;
-    padding: 10px;
-    text-align: center;
-}
-
-th {
-    background: #555;
-}
-
-button {
-    padding: 10px;
-    margin: 5px;
-    cursor: pointer;
-    border: none;
-    border-radius: 5px;
-}
-
-button:hover {
-    opacity: 0.8;
-}
-
-.btn-logout {
-    background: red;
-    color: white;
-    float: right;
-    padding: 10px 15px;
-    border-radius: 5px;
-}
-</style>
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>RFID Dashboard</title>
-    <link rel="stylesheet" href="styles.css">
+    <style>
+        body { font-family: Arial, sans-serif; background-color: #222; color: white; text-align: center; }
+        table { width: 60%; margin: auto; border-collapse: collapse; }
+        th, td { border: 1px solid white; padding: 10px; text-align: center; }
+        button { padding: 5px 10px; cursor: pointer; }
+        .update { background-color: green; color: white; }
+        .delete { background-color: red; color: white; }
+        .attendance { background-color: blue; color: white; }
+        .logout { background-color: orange; color: white; margin-top: 20px; }
+        .attendance { background-color: orange; color: white; margin-top: 40px; }
+    </style>
 </head>
 <body>
-
-    <div class="container">
-        <h1>RFID Dashboard</h1>
-        <button onclick="logout()" class="btn-logout">Logout</button>
-        <table>
-            <thead>
-                <tr>
-                    <th>Name</th>
-                    <th>UID</th>
-                    <th>New Name</th>
-                    <th>Actions</th>
-                </tr>
-            </thead>
-            <tbody id="userTable"></tbody>
-        </table>
-    </div>
+    <h1>RFID Dashboard</h1>
+    <button class="logout" onclick="logout()">Logout</button>
+     <button class="attendance" onclick="attendance()">Attendance</button>
+    <table>
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>UID</th>
+                <th>New Name</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody id="userTable"></tbody>
+    </table>
 
     <script>
-        const scriptUrl = "https://script.google.com/macros/s/AKfycbwwvcQqfZnwieqnQCocAP_cUC7F8drgTOqdHS8zAPe6lxflaVG_lnCYmf5ghb9BU78zNQ/exec";
+        const scriptURL = "YOUR_GOOGLE_SCRIPT_URL";
 
         function fetchUsers() {
-            fetch(`${scriptUrl}?action=getUsers`)
+            fetch(scriptURL)
                 .then(response => response.json())
                 .then(data => {
-                    let table = document.getElementById("userTable");
-                    table.innerHTML = "";
+                    let tableBody = document.getElementById("userTable");
+                    tableBody.innerHTML = "";
                     data.forEach(user => {
-                        table.innerHTML += `
+                        tableBody.innerHTML += `
                             <tr>
                                 <td>${user.name}</td>
                                 <td>${user.uid}</td>
-                                <td><input type="text" id="newName-${user.uid}" placeholder="Enter new name"></td>
+                                <td><input id="name-${user.uid}" type="text" placeholder="Enter new name"></td>
                                 <td>
-                                    <button onclick="updateUser('${user.uid}')">Update</button>
-                                    <button onclick="deleteUser('${user.uid}')">Delete</button>
-                                    <button onclick="markAttendance('${user.uid}')">Attendance</button>
+                                    <button class="update" onclick="updateUser('${user.uid}')">Update</button>
+                                    <button class="delete" onclick="deleteUser('${user.uid}')">Delete</button>
                                 </td>
-                            </tr>`;
+                            </tr>
+                        `;
                     });
-                })
-                .catch(error => console.error("Error fetching users:", error));
+                });
         }
 
         function updateUser(uid) {
-            let newName = document.getElementById(`newName-${uid}`).value;
-            fetch(scriptUrl, {
+            var newName = document.getElementById(`name-${uid}`).value;
+            fetch(scriptURL, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ action: "update", uid: uid, name: newName })
@@ -114,12 +69,11 @@ button:hover {
                 alert(data.message);
                 fetchUsers();
             })
-            .catch(error => alert("Update failed!"));
+            .catch(() => alert("Update failed!"));
         }
 
         function deleteUser(uid) {
-            if (!confirm("Are you sure you want to delete this user?")) return;
-            fetch(scriptUrl, {
+            fetch(scriptURL, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ action: "delete", uid: uid })
@@ -129,11 +83,11 @@ button:hover {
                 alert(data.message);
                 fetchUsers();
             })
-            .catch(error => alert("Delete failed!"));
+            .catch(() => alert("Delete failed!"));
         }
 
         function markAttendance(uid) {
-            fetch(scriptUrl, {
+            fetch(scriptURL, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ action: "attendance", uid: uid })
@@ -142,13 +96,15 @@ button:hover {
             .then(data => {
                 alert(data.message);
             })
-            .catch(error => alert("Attendance failed!"));
+            .catch(() => alert("Attendance marking failed!"));
         }
 
         function logout() {
-            window.location.href = "index.html";
+            window.location.href = "login.html"; // Redirect to login page
         }
-
+        
+        function attendance() {
+            window.location.href = "index.html"; // Redirect to login page
         fetchUsers();
     </script>
 </body>
