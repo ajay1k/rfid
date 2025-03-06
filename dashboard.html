@@ -5,32 +5,43 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>RFID Registration Panel</title>
     <style>
+        /* General Styles */
         body {
-            font-family: Arial, sans-serif;
+            font-family: 'Poppins', sans-serif;
             background: linear-gradient(to right, #0f2027, #203a43, #2c5364);
             color: white;
             text-align: center;
             margin: 0;
             padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
         }
 
         .container {
             width: 80%;
-            margin: 50px auto;
-            background: rgba(0, 0, 0, 0.7);
+            margin: 20px auto;
+            background: rgba(255, 255, 255, 0.1);
             padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.5);
+            border-radius: 15px;
+            box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            overflow: hidden;
         }
 
         h1 {
             margin-bottom: 20px;
+            font-size: 28px;
         }
 
+        /* Table Styles */
         table {
             width: 100%;
             border-collapse: collapse;
             margin-top: 20px;
+            backdrop-filter: blur(20px);
         }
 
         th, td {
@@ -55,24 +66,69 @@
             background: rgba(255, 255, 255, 0.2);
             color: white;
             text-align: center;
+            outline: none;
+            transition: 0.3s;
         }
 
         input::placeholder {
             color: #ddd;
         }
 
-        button {
-            background: red;
-            color: white;
+        input:focus {
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        /* Button Styles */
+        .button {
             padding: 8px 15px;
             border: none;
             cursor: pointer;
-            border-radius: 5px;
+            border-radius: 8px;
             font-weight: bold;
+            font-size: 14px;
+            transition: 0.3s;
         }
 
-        button:hover {
-            background: darkred;
+        .update-btn {
+            background: #ff4747;
+            color: white;
+            box-shadow: 0 4px 8px rgba(255, 71, 71, 0.4);
+        }
+
+        .update-btn:hover {
+            background: #ff0000;
+            transform: scale(1.05);
+        }
+
+        .delete-btn {
+            background: black;
+            color: white;
+            box-shadow: 0 4px 8px rgba(255, 255, 255, 0.3);
+        }
+
+        .delete-btn:hover {
+            background: #333;
+            transform: scale(1.05);
+        }
+
+        /* Responsive Design */
+        @media screen and (max-width: 768px) {
+            .container {
+                width: 95%;
+            }
+
+            th, td {
+                font-size: 14px;
+                padding: 8px;
+            }
+
+            input {
+                width: 100%;
+            }
+
+            .button {
+                font-size: 12px;
+            }
         }
     </style>
 </head>
@@ -87,6 +143,7 @@
                     <th>UID</th>
                     <th>NEW NAME</th>
                     <th>UPDATE</th>
+                    <th>DELETE</th>
                 </tr>
             </thead>
             <tbody id="userTable">
@@ -95,6 +152,68 @@
         </table>
     </div>
 
-    <script src="script.js"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            fetchUserData();
+        });
+
+        function fetchUserData() {
+            fetch("https://script.google.com/macros/s/YOUR_SCRIPT_ID/exec?action=getUsers")
+                .then(response => response.json())
+                .then(data => {
+                    const tableBody = document.getElementById("userTable");
+                    tableBody.innerHTML = ""; // Clear table
+
+                    data.forEach(user => {
+                        let row = `<tr>
+                            <td>${user.name}</td>
+                            <td>${user.uid}</td>
+                            <td><input type="text" id="newName-${user.uid}" placeholder="Enter new name"></td>
+                            <td><button class="button update-btn" onclick="updateName('${user.uid}')">Update</button></td>
+                            <td><button class="button delete-btn" onclick="deleteUser('${user.uid}')">Delete</button></td>
+                        </tr>`;
+                        tableBody.innerHTML += row;
+                    });
+                })
+                .catch(error => console.error("Error fetching data:", error));
+        }
+
+        function updateName(uid) {
+            const newName = document.getElementById(`newName-${uid}`).value;
+            if (!newName) {
+                alert("Please enter a new name.");
+                return;
+            }
+
+            fetch("https://script.google.com/macros/s/AKfycbwgpEy1oEt9pqZWN86oBIVkTS8v2TJe8yrgqPWS06VY4PJfLRaX75KmHWDrj-OrTXhn_g/exec", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ action: "update", uid: uid, newName: newName })
+            })
+            .then(response => response.text())
+            .then(data => {
+                alert(data);
+                fetchUserData(); // Refresh the table
+            })
+            .catch(error => console.error("Error updating name:", error));
+        }
+
+        function deleteUser(uid) {
+            if (!confirm("Are you sure you want to delete this user?")) return;
+
+            fetch("https://script.google.com/macros/s/YOUR_SCRIPT_ID/exec", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ action: "delete", uid: uid })
+            })
+            .then(response => response.text())
+            .then(data => {
+                alert(data);
+                fetchUserData(); // Refresh the table
+            })
+            .catch(error => console.error("Error deleting user:", error));
+        }
+    </script>
+
 </body>
 </html>
