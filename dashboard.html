@@ -33,79 +33,33 @@
     </table>
 
     <script>
-        const scriptURL = "https://script.google.com/macros/s/AKfycbyrp2XH1h_tI6DYbwuixspU5x6I8FUtYwKH_VNaPCDmp1yQMZSPgEqDJ8BkSqVvSCNdZg/exec";
+        const API_URL = "https://script.google.com/macros/s/AKfycbwmEfriTUDXVBmbCbl7EUVCsBdTr5gbkYDqAOM9r3CQQw01kiEuDzyOg4tzmBK6gPx7RA/exec";
 
-        function fetchUsers() {
-            fetch(scriptURL)
-                .then(response => response.json())
-                .then(data => {
-                    let tableBody = document.getElementById("userTable");
-                    tableBody.innerHTML = "";
-                    data.forEach(user => {
-                        tableBody.innerHTML += `
-                            <tr>
-                                <td>${user.name}</td>
-                                <td>${user.uid}</td>
-                                <td><input id="name-${user.uid}" type="text" placeholder="Enter new name"></td>
-                                <td>
-                                    <button class="update" onclick="updateUser('${user.uid}')">Update</button>
-                                    <button class="delete" onclick="deleteUser('${user.uid}')">Delete</button>
-                                </td>
-                            </tr>
-                        `;
-                    });
-                });
+async function fetchData() {
+    try {
+        let response = await fetch(API_URL);
+        if (!response.ok) {
+            throw new Error(`HTTP error! Status: ${response.status}`);
         }
+        let data = await response.json();
+        console.log("Fetched Data:", data);
+        displayData(data);
+    } catch (error) {
+        console.error("Fetch error:", error);
+    }
+}
 
-        function updateUser(uid) {
-            var newName = document.getElementById(`name-${uid}`).value;
-            fetch(scriptURL, {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ action: "update", uid: uid, name: newName })
-            })
-            .then(response => response.json())
-            .then(data => {
-                alert(data.message);
-                fetchUsers();
-            })
-            .catch(() => alert("Update failed!"));
-        }
+function displayData(data) {
+    const outputDiv = document.getElementById("output");
+    outputDiv.innerHTML = "<h3>Fetched Data</h3>";
+    data.forEach(item => {
+        outputDiv.innerHTML += `<p>Name: ${item.name}, UID: ${item.uid}</p>`;
+    });
+}
 
-        function deleteUser(uid) {
-            fetch(scriptURL, {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ action: "delete", uid: uid })
-            })
-            .then(response => response.json())
-            .then(data => {
-                alert(data.message);
-                fetchUsers();
-            })
-            .catch(() => alert("Delete failed!"));
-        }
+// Call the function to fetch data
+fetchData();
 
-        function markAttendance(uid) {
-            fetch(scriptURL, {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ action: "attendance", uid: uid })
-            })
-            .then(response => response.json())
-            .then(data => {
-                alert(data.message);
-            })
-            .catch(() => alert("Attendance marking failed!"));
-        }
-
-        function logout() {
-            window.location.href = "login.html"; // Redirect to login page
-        }
-        
-        function attendance() {
-            window.location.href = "index.html"; // Redirect to login page
-        fetchUsers();
     </script>
 </body>
 </html>
