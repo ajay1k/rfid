@@ -3,217 +3,124 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>RFID Registration Panel</title>
+    <title>RFID Attendance System</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
-        /* General Styles */
-        body {
-            font-family: 'Poppins', sans-serif;
-            background: linear-gradient(to right, #0f2027, #203a43, #2c5364);
-            color: white;
-            text-align: center;
-            margin: 0;
-            padding: 0;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-        }
-
-        .container {
-            width: 80%;
-            margin: 20px auto;
-            background: rgba(255, 255, 255, 0.1);
-            padding: 20px;
-            border-radius: 15px;
-            box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.5);
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
-            overflow: hidden;
-        }
-
-        h1 {
-            margin-bottom: 20px;
-            font-size: 28px;
-        }
-
-        /* Table Styles */
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 20px;
-            backdrop-filter: blur(20px);
-        }
-
-        th, td {
-            padding: 12px;
-            text-align: center;
-        }
-
-        th {
-            background: rgba(255, 255, 255, 0.2);
-            font-weight: bold;
-        }
-
-        td {
-            background: rgba(255, 255, 255, 0.1);
-        }
-
-        input {
-            padding: 8px;
-            width: 80%;
-            border: none;
-            border-radius: 5px;
-            background: rgba(255, 255, 255, 0.2);
-            color: white;
-            text-align: center;
-            outline: none;
-            transition: 0.3s;
-        }
-
-        input::placeholder {
-            color: #ddd;
-        }
-
-        input:focus {
-            background: rgba(255, 255, 255, 0.3);
-        }
-
-        /* Button Styles */
-        .button {
-            padding: 8px 15px;
-            border: none;
-            cursor: pointer;
-            border-radius: 8px;
-            font-weight: bold;
-            font-size: 14px;
-            transition: 0.3s;
-        }
-
-        .update-btn {
-            background: #ff4747;
-            color: white;
-            box-shadow: 0 4px 8px rgba(255, 71, 71, 0.4);
-        }
-
-        .update-btn:hover {
-            background: #ff0000;
-            transform: scale(1.05);
-        }
-
-        .delete-btn {
-            background: black;
-            color: white;
-            box-shadow: 0 4px 8px rgba(255, 255, 255, 0.3);
-        }
-
-        .delete-btn:hover {
-            background: #333;
-            transform: scale(1.05);
-        }
-
-        /* Responsive Design */
-        @media screen and (max-width: 768px) {
-            .container {
-                width: 95%;
-            }
-
-            th, td {
-                font-size: 14px;
-                padding: 8px;
-            }
-
-            input {
-                width: 100%;
-            }
-
-            .button {
-                font-size: 12px;
-            }
-        }
+        body { background-color: #f4f4f4; }
+        .container { margin-top: 50px; }
+        .card { border-radius: 10px; box-shadow: 0 0 10px rgba(0,0,0,0.1); }
+        .btn { border-radius: 5px; }
     </style>
 </head>
 <body>
 
-    <div class="container">
-        <h1>Registration Panel</h1>
-        <table>
-            <thead>
-                <tr>
-                    <th>NAME</th>
-                    <th>UID</th>
-                    <th>NEW NAME</th>
-                    <th>UPDATE</th>
-                    <th>DELETE</th>
-                </tr>
-            </thead>
-            <tbody id="userTable">
-                <!-- Data will be loaded here from JavaScript -->
-            </tbody>
-        </table>
+<div class="container">
+    <h2 class="text-center mb-4">RFID Registration & Attendance</h2>
+
+    <!-- Form to Register New User -->
+    <div class="card p-4">
+        <h4>Register User</h4>
+        <div class="mb-3">
+            <input type="text" id="name" class="form-control" placeholder="Enter Name">
+        </div>
+        <div class="mb-3">
+            <input type="text" id="uid" class="form-control" placeholder="Enter UID (RFID)">
+        </div>
+        <button class="btn btn-primary" onclick="registerUser()">Register</button>
     </div>
 
-    <script>
-        document.addEventListener("DOMContentLoaded", function() {
-            fetchUserData();
-        });
+    <hr>
 
-        function fetchUserData() {
-            fetch("https://script.google.com/macros/s/AKfycbxppXs-8i0e0-YDCgOcpqQ3qPYLekPbwSzVNnm79A1EGQkmzV1Ot3FT2i0WqNp1pBraLw/exec?action=getuser_data")
-                .then(response => response.json())
-                .then(data => {
-                    const tableBody = document.getElementById("userTable");
-                    tableBody.innerHTML = ""; // Clear table
+    <!-- Display Registered Users -->
+    <div class="card p-4">
+        <h4>Registered Users</h4>
+        <table class="table table-bordered">
+            <thead class="table-dark">
+                <tr>
+                    <th>Name</th>
+                    <th>UID</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody id="userTable"></tbody>
+        </table>
+    </div>
+</div>
 
-                    data.forEach(user => {
-                        let row = `<tr>
-                            <td>${user.name}</td>
-                            <td>${user.uid}</td>
-                            <td><input type="text" id="newName-${user.uid}" placeholder="Enter new name"></td>
-                            <td><button class="button update-btn" onclick="updateName('${user.uid}')">Update</button></td>
-                            <td><button class="button delete-btn" onclick="deleteUser('${user.uid}')">Delete</button></td>
-                        </tr>`;
-                        tableBody.innerHTML += row;
-                    });
-                })
-                .catch(error => console.error("Error fetching data:", error));
-        }
+<script>
+const API_URL = "https://script.google.com/macros/s/AKfycbxppXs-8i0e0-YDCgOcpqQ3qPYLekPbwSzVNnm79A1EGQkmzV1Ot3FT2i0WqNp1pBraLw/exec"; // Replace with your Google Apps Script URL
 
-        function updateName(uid) {
-            const newName = document.getElementById(`newName-${uid}`).value;
-            if (!newName) {
-                alert("Please enter a new name.");
-                return;
-            }
+// Fetch Users and Display in Table
+function fetchUsers() {
+    fetch(API_URL)
+        .then(response => response.json())
+        .then(data => {
+            let table = document.getElementById("userTable");
+            table.innerHTML = "";
+            data.forEach(user => {
+                table.innerHTML += `
+                    <tr>
+                        <td><input type="text" value="${user.name}" id="name-${user.uid}" class="form-control"></td>
+                        <td>${user.uid}</td>
+                        <td>
+                            <button class="btn btn-success btn-sm" onclick="updateUser('${user.uid}')">Update</button>
+                            <button class="btn btn-danger btn-sm" onclick="deleteUser('${user.uid}')">Delete</button>
+                        </td>
+                    </tr>`;
+            });
+        })
+        .catch(error => console.error("Error fetching users:", error));
+}
 
-            fetch("https://script.google.com/macros/s/AKfycbxppXs-8i0e0-YDCgOcpqQ3qPYLekPbwSzVNnm79A1EGQkmzV1Ot3FT2i0WqNp1pBraLw/exec", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ action: "update", uid: uid, newName: newName })
-            })
-            .then(response => response.text())
-            .then(data => {
-                alert(data);
-                fetchUserData(); // Refresh the table
-            })
-            .catch(error => console.error("Error updating name:", error));
-        }
+// Register User
+function registerUser() {
+    let name = document.getElementById("name").value.trim();
+    let uid = document.getElementById("uid").value.trim();
+    if (!name || !uid) {
+        alert("Please enter both Name and UID.");
+        return;
+    }
 
-        function deleteUser(uid) {
-            if (!confirm("Are you sure you want to delete this user?")) return;
+    fetch(API_URL, {
+        method: "POST",
+        body: JSON.stringify({ action: "register", name, uid }),
+        headers: { "Content-Type": "application/json" }
+    }).then(() => {
+        alert("User Registered!");
+        fetchUsers();
+    });
+}
 
-            fetch("https://script.google.com/macros/s/AKfycbxppXs-8i0e0-YDCgOcpqQ3qPYLekPbwSzVNnm79A1EGQkmzV1Ot3FT2i0WqNp1pBraLw/exec", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ action: "delete", uid: uid })
-            })
-            .then(response => response.text())
-            .then(data => {
-                alert(data);
-                fetchUserData(); // Refresh the table
-            })
-            .catch(error => console.error("Error deleting user:", error));
-        }
-    </script>
+// Update User
+function updateUser(uid) {
+    let newName = document.getElementById(`name-${uid}`).value;
+    fetch(API_URL, {
+        method: "POST",
+        body: JSON.stringify({ action: "update", uid, newName }),
+        headers: { "Content-Type": "application/json" }
+    }).then(() => {
+        alert("User Updated!");
+        fetchUsers();
+    });
+}
+
+// Delete User
+function deleteUser(uid) {
+    if (!confirm("Are you sure you want to delete this user?")) return;
+    
+    fetch(API_URL, {
+        method: "POST",
+        body: JSON.stringify({ action: "delete", uid }),
+        headers: { "Content-Type": "application/json" }
+    }).then(() => {
+        alert("User Deleted!");
+        fetchUsers();
+    });
+}
+
+// Load Users on Page Load
+fetchUsers();
+</script>
 
 </body>
 </html>
