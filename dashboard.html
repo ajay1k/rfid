@@ -1,80 +1,68 @@
 <!DOCTYPE html>
 <html lang="en">
+    <style>
+    body {
+    font-family: Arial, sans-serif;
+    background: #222;
+    color: #fff;
+    text-align: center;
+}
+
+.container {
+    width: 80%;
+    margin: 20px auto;
+    background: #333;
+    padding: 20px;
+    border-radius: 10px;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+}
+
+th, td {
+    border: 1px solid #444;
+    padding: 10px;
+    text-align: center;
+}
+
+th {
+    background: #555;
+}
+
+button {
+    padding: 10px;
+    margin: 5px;
+    cursor: pointer;
+    border: none;
+    border-radius: 5px;
+}
+
+button:hover {
+    opacity: 0.8;
+}
+
+.btn-logout {
+    background: red;
+    color: white;
+    float: right;
+    padding: 10px 15px;
+    border-radius: 5px;
+}
+</style>
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>RFID Registration Panel</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            background: url('https://source.unsplash.com/1600x900/?technology,digital') no-repeat center center/cover;
-            color: white;
-            text-align: center;
-        }
-        .container {
-            width: 70%;
-            margin: auto;
-            padding: 20px;
-            background: rgba(0, 0, 0, 0.8);
-            border-radius: 10px;
-            box-shadow: 0px 4px 8px rgba(255, 255, 255, 0.2);
-        }
-        table {
-            width: 100%;
-            margin-top: 20px;
-            border-collapse: collapse;
-            background: #222;
-            color: white;
-            border-radius: 10px;
-            overflow: hidden;
-        }
-        th, td {
-            padding: 12px;
-            border-bottom: 1px solid #444;
-        }
-        th {
-            background: #444;
-        }
-        input {
-            padding: 6px;
-            border-radius: 5px;
-            border: none;
-            background: #555;
-            color: white;
-        }
-        .btn {
-            padding: 8px 12px;
-            border: none;
-            border-radius: 5px;
-            color: white;
-            cursor: pointer;
-            transition: 0.3s;
-        }
-        .btn-update {
-            background: #28a745;
-        }
-        .btn-update:hover {
-            background: #218838;
-        }
-        .btn-delete {
-            background: #dc3545;
-        }
-        .btn-delete:hover {
-            background: #c82333;
-        }
-        .btn-logout {
-            background: #ff6600;
-            margin-top: 10px;
-        }
-        .btn-logout:hover {
-            background: #cc5200;
-        }
-    </style>
+    <title>RFID Dashboard</title>
+    <link rel="stylesheet" href="styles.css">
 </head>
 <body>
+
     <div class="container">
-        <h2>RFID Registration Panel</h2>
-        <button class="btn btn-logout" onclick="logout()">Logout</button>
+        <h1>RFID Dashboard</h1>
+        <button onclick="logout()" class="btn-logout">Logout</button>
         <table>
             <thead>
                 <tr>
@@ -84,96 +72,83 @@
                     <th>Actions</th>
                 </tr>
             </thead>
-            <tbody id="userTable">
-                <!-- Data will be inserted here -->
-            </tbody>
+            <tbody id="userTable"></tbody>
         </table>
     </div>
 
     <script>
-        const scriptUrl = "https://script.google.com/macros/s/AKfycbxzXxc1iczeOxV1thhnlrKd4rEIykBXGqJpllna7jqZElBILI9yNhepRMo7nZiHamFqgg/exec";  // Replace with actual Web App URL
+        const scriptUrl = "https://script.google.com/macros/s/AKfycbwwvcQqfZnwieqnQCocAP_cUC7F8drgTOqdHS8zAPe6lxflaVG_lnCYmf5ghb9BU78zNQ/exec";
 
-        // Fetch users from Google Sheets
         function fetchUsers() {
-            fetch(scriptUrl + "?action=getUsers")
+            fetch(`${scriptUrl}?action=getUsers`)
                 .then(response => response.json())
-                .then(users => {
-                    const table = document.getElementById("userTable");
-                    table.innerHTML = ""; // Clear table
-
-                    users.forEach(user => {
-                        const row = document.createElement("tr");
-                        row.innerHTML = `
-                            <td>${user.name}</td>
-                            <td>${user.uid}</td>
-                            <td><input type="text" id="name-${user.uid}" placeholder="Enter new name"></td>
-                            <td>
-                                <button class="btn btn-update" onclick="updateUser('${user.uid}')">Update</button>
-                                <button class="btn btn-delete" onclick="deleteUser('${user.uid}')">Delete</button>
-                            </td>
-                        `;
-                        table.appendChild(row);
+                .then(data => {
+                    let table = document.getElementById("userTable");
+                    table.innerHTML = "";
+                    data.forEach(user => {
+                        table.innerHTML += `
+                            <tr>
+                                <td>${user.name}</td>
+                                <td>${user.uid}</td>
+                                <td><input type="text" id="newName-${user.uid}" placeholder="Enter new name"></td>
+                                <td>
+                                    <button onclick="updateUser('${user.uid}')">Update</button>
+                                    <button onclick="deleteUser('${user.uid}')">Delete</button>
+                                    <button onclick="markAttendance('${user.uid}')">Attendance</button>
+                                </td>
+                            </tr>`;
                     });
                 })
                 .catch(error => console.error("Error fetching users:", error));
         }
 
-        // Update user in Google Sheets
         function updateUser(uid) {
-            const newName = document.getElementById(`name-${uid}`).value;
-            if (!newName) {
-                alert("Enter a new name to update!");
-                return;
-            }
-
+            let newName = document.getElementById(`newName-${uid}`).value;
             fetch(scriptUrl, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ action: "update", uid: uid, newName: newName })
+                body: JSON.stringify({ action: "update", uid: uid, name: newName })
             })
-            .then(response => response.json()) 
+            .then(response => response.json())
             .then(data => {
-                console.log("Update response:", data);
-                alert(data.message || "User updated successfully!");
-                fetchUsers(); // Refresh table
+                alert(data.message);
+                fetchUsers();
             })
-            .catch(error => {
-                console.error("Error updating user:", error);
-                alert("Update failed!");
-            });
+            .catch(error => alert("Update failed!"));
         }
 
-        // Delete user from Google Sheets
         function deleteUser(uid) {
             if (!confirm("Are you sure you want to delete this user?")) return;
-
             fetch(scriptUrl, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ action: "delete", uid: uid })
             })
-            .then(response => response.json()) 
+            .then(response => response.json())
             .then(data => {
-                console.log("Delete response:", data);
-                alert(data.message || "User deleted successfully!");
-                fetchUsers(); // Refresh table
+                alert(data.message);
+                fetchUsers();
             })
-            .catch(error => {
-                console.error("Error deleting user:", error);
-                alert("Delete failed!");
-            });
+            .catch(error => alert("Delete failed!"));
         }
 
-        // Logout Function
+        function markAttendance(uid) {
+            fetch(scriptUrl, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ action: "attendance", uid: uid })
+            })
+            .then(response => response.json())
+            .then(data => {
+                alert(data.message);
+            })
+            .catch(error => alert("Attendance failed!"));
+        }
+
         function logout() {
-            alert("Logging out...");
-            window.location.href = "login.html";  // Redirect to login page (update with your login page)
+            window.location.href = "index.html";
         }
 
-        // Auto-refresh every 1 minute
-        setInterval(fetchUsers, 20000);
-
-        // Load users on page load
         fetchUsers();
     </script>
 </body>
