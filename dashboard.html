@@ -158,7 +158,7 @@
         });
 
         function fetchUserData() {
-            fetch("hhttps://script.google.com/macros/s/AKfycbytYKi7Whng8E3QdCfcs4n6rmFIs0z4z90tPBNeIgO25UxBcXJGsLxg0t-nA2CSouqHFg/exec?action=getUsers")
+            fetch("https://script.google.com/macros/s/AKfycbytYKi7Whng8E3QdCfcs4n6rmFIs0z4z90tPBNeIgO25UxBcXJGsLxg0t-nA2CSouqHFg/exec?action=getuser_data")
                 .then(response => response.json())
                 .then(data => {
                     const tableBody = document.getElementById("userTable");
