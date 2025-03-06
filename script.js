@@ -1,85 +1,45 @@
-const API_URL = "https://script.google.com/macros/s/AKfycbzGZc5mG2xlgf-X6vBELzoBk7EBdb2Ad4ge5ArMwWs9q5cjrL-ShCJgPbj0JLe_gPJ31g/exec"; // Replace with your Web App URL
+document.addEventListener("DOMContentLoaded", function() {
+    fetchUserData();
+});
 
-// Function to Fetch & Display Data
-async function fetchUserData() {
-    try {
-        let response = await fetch(API_URL);
-        let data = await response.json();
+function fetchUserData() {
+    fetch("https://script.google.com/macros/s/AKfycbwgpEy1oEt9pqZWN86oBIVkTS8v2TJe8yrgqPWS06VY4PJfLRaX75KmHWDrj-OrTXhn_g/exec")
+        .then(response => response.json())
+        .then(data => {
+            const tableBody = document.getElementById("userTable");
+            tableBody.innerHTML = ""; // Clear table
+            data.forEach(user => {
+                let row = `<tr>
+                    <td>${user.name}</td>
+                    <td>${user.uid}</td>
+                    <td><input type="text" id="newName-${user.uid}" placeholder="Enter new name"></td>
+                    <td><button onclick="updateName('${user.uid}')">Update</button></td>
+                </tr>`;
+                tableBody.innerHTML += row;
+            });
+        })
+        .catch(error => console.error("Error fetching data:", error));
+}
 
-        let tableBody = document.getElementById("userTableBody");
-        tableBody.innerHTML = ""; // Clear old data
-
-        data.forEach((user, index) => {
-            let row = `<tr>
-                <td>${user.name}</td>
-                <td>${user.uid}</td>
-                <td><button onclick="updateUser('${user.uid}', '${user.name}')">Update</button></td>
-                <td><button onclick="deleteUser('${user.uid}')">Delete</button></td>
-            </tr>`;
-            tableBody.innerHTML += row;
-        });
-    } catch (error) {
-        console.error("Error fetching data:", error);
+function updateName(uid) {
+    const newName = document.getElementById(`newName-${uid}`).value;
+    if (!newName) {
+        alert("Please enter a new name.");
+        return;
     }
-}
-
-// Function to Add New User
-async function addUser() {
-    let name = document.getElementById("newName").value;
-    let uid = document.getElementById("newUID").value;
-
-    let response = await fetch(API_URL, {
+    fetch("https://script.google.com/macros/s/YOUR_SCRIPT_ID/exec", {
         method: "POST",
-        body: JSON.stringify({ action: "addUser", name: name, uid: uid }),
-    });
-
-    let result = await response.text();
-    alert(result);
-    fetchUserData();
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action: "update", uid: uid, newName: newName })
+    })
+    .then(response => response.text())
+    .then(data => {
+        alert(data);
+        fetchUserData(); // Refresh the table
+    })
+    .catch(error => console.error("Error updating name:", error));
 }
 
-// Function to Update User
-async function updateUser(uid, oldName) {
-    let newName = prompt("Enter new name for UID " + uid, oldName);
-    if (!newName) return;
-
-    let response = await fetch(API_URL, {
-        method: "POST",
-        body: JSON.stringify({ action: "updateUser", uid: uid, name: newName }),
-    });
-
-    let result = await response.text();
-    alert(result);
-    fetchUserData();
-}
-
-// Function to Delete User
-async function deleteUser(uid) {
-    if (!confirm("Are you sure you want to delete UID " + uid + "?")) return;
-
-    let response = await fetch(API_URL, {
-        method: "POST",
-        body: JSON.stringify({ action: "deleteUser", uid: uid }),
-    });
-
-    let result = await response.text();
-    alert(result);
-    fetchUserData();
-}
-
-// Function to Mark Attendance
-async function markAttendance() {
-    let uid = prompt("Enter UID for attendance:");
-    if (!uid) return;
-
-    let response = await fetch(API_URL, {
-        method: "POST",
-        body: JSON.stringify({ action: "addAttendance", uid: uid }),
-    });
-
-    let result = await response.text();
-    alert(result);
-}
 
 // Load Data When Page Opens
 document.addEventListener("DOMContentLoaded", fetchUserData);
